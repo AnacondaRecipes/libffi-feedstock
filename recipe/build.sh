@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+shopt -s extglob
+
+export CFLAGS="${CFLAGS//-fvisibility=+([! ])/}"
+export CXXFLAGS="${CXXFLAGS//-fvisibility=+([! ])/}"
+
 if [[ $(uname) == "Linux" ]]; then
   # this changes the install dir from ${PREFIX}/lib64 to ${PREFIX}/lib
   sed -i 's:@toolexeclibdir@:$(libdir):g' Makefile.in */Makefile.in
