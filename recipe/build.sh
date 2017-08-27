@@ -16,7 +16,7 @@ fi
             --prefix="${PREFIX}" --includedir="${PREFIX}/include" \
   || { cat config.log; exit 1;}
 
-make
+make -j${CPU_COUNT} ${VERBOSE_AT}
 
 if [[ -n "${QEMU_LD_PREFIX}" ]] && [[ "${HOST}" != "${BUILD}" ]]; then
   # Yuck. Dejagnu should instead pass '-Wl,-rpath=\$ORIGIN/../.libs' when building
