@@ -13,8 +13,11 @@ source:
     - configure_includedir_option.patch
 
 build:
-  number: 3
+  number: 4
   skip: True  # [win]
+  run_exports:
+    # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
+    - {{ pin_subpackage('libffi') }}
 
 requirements:
   build:
