@@ -29,3 +29,6 @@ else
 fi
 
 make install
+
+# This overlaps with libgcc-ng:
+rm -rf ${PREFIX}/share/info/dir
