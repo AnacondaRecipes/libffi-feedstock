@@ -1,5 +1,5 @@
 {% set name = "libffi" %}
-{% set version = "3.2.1" %}
+{% set version = "3.3" %}
 
 package:
   name: {{ name|lower }}
@@ -8,12 +8,10 @@ package:
 source:
   fn: {{ name }}-{{ version }}.tar.gz
   url: ftp://sourceware.org/pub/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha1: 280c265b789e041c02e5c97815793dfc283fb1e6
-  patches:
-    - configure_includedir_option.patch
+  sha1: 8df6cb570c8d6596a67d1c0773bf00650154f7aa
 
 build:
-  number: 5
+  number: 0
   skip: True  # [win]
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
@@ -24,6 +22,7 @@ requirements:
     - autoconf
     - automake
     - libtool
+    - make
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
 
