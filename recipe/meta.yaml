@@ -13,11 +13,11 @@ source:
     - patches/0001-check-for-existence-of-type-before-setting.patch
 
 build:
-  number: 0
+  number: 1
   skip: True  # [win]
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
-    - {{ pin_subpackage('libffi') }}
+    - {{ pin_subpackage('libffi', max_pin='x.x') }}
 
 requirements:
   build:
