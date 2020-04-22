@@ -9,6 +9,8 @@ source:
   fn: {{ name }}-{{ version }}.tar.gz
   url: ftp://sourceware.org/pub/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha1: 8df6cb570c8d6596a67d1c0773bf00650154f7aa
+  patches:
+    - patches/0001-check-for-existence-of-type-before-setting.patch
 
 build:
   number: 0
