@@ -13,7 +13,7 @@ source:
     - patches/0001-check-for-existence-of-type-before-setting.patch
 
 build:
-  number: 1
+  number: 2
   skip: True  # [win]
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/

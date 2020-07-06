@@ -32,3 +32,13 @@ make install
 
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
+
+# libffi 3.3 is ABI compatible with libffi 3.2.x but changed SONAMEs (.6->.7).
+# For compatibility with packages which do not have corrected dependency
+# information, include a libffi.so.6/libffi.6.dylib symlink.
+if [[ $(uname) == "Linux" ]]; then
+    ln -s ${PREFIX}/lib/libffi.so.7 ${PREFIX}/lib/libffi.so.6
+else
+    ln -s ${PREFIX}/lib/libffi.7.dylib ${PREFIX}/lib/libffi.6.dylib
+fi
+
