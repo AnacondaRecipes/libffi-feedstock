@@ -32,6 +32,7 @@ requirements:
     - make                               # [unix] 
     - {{posix}}autoconf
     - {{posix}}automake{{ am_version }}  # [win]
+    - {{posix}}automake-wrapper  # [win]
     - {{posix}}automake                  # [not win]
     - {{posix}}libtool
     - {{posix}}patch

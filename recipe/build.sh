@@ -22,12 +22,12 @@ configure_args=(
 
 # Windows fun
 
-if [[ "$target_platform" == "win-64" ]] ; then
+if [[ ${SUBDIR} =~ win* ]] ; then
     # Many many many autotools bits hardcode Windows checks that fail when the
     # OS is our default, "msys2", rather than something starting with cygwin
     # or mingw.
-    export BUILD=x86_64-pc-mingw64
-    export HOST=x86_64-pc-mingw64
+    export BUILD=$(uname -m)-pc-mingw${ARCH}
+    export HOST=$(uname -m)-pc-mingw${ARCH}
 
     # Needed for autoreconf to work - keep version sync'ed with meta.yaml.
     am_version=1.15
@@ -37,8 +37,8 @@ if [[ "$target_platform" == "win-64" ]] ; then
     # Special compiler wrappers. Modern autotools do OK when working with "cl"
     # directly, but we need to preprocess an assembly (.S) file, which libffis
     # msvcc.sh wrapper takes care of.
-    export CC="$(pwd)/msvcc.sh -m64"
-    export CXX="$(pwd)/msvcc.sh -m64"
+    export CC="$(pwd)/msvcc.sh -m${ARCH}"
+    export CXX="$(pwd)/msvcc.sh -m${ARCH}"
     export LD="link"
     export CPP="cl -nologo -EP"
     export CXXCPP="cl -nologo -EP"
