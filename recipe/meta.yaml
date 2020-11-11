@@ -1,4 +1,4 @@
-{% set version = "3.2.1" %}
+{% set version = "3.3" %}
 {% set am_version = "1.15" %} # keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -9,7 +9,7 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
-  sha256: 96d08dee6f262beea1a18ac9a3801f64018dc4521895e9198d029d6850febe23
+  sha256: 3f2f86094f5cf4c36cfe850d2fe029d01f5c2c2296619407c8ba0d8207da9a6b
   patches:
     - configure_includedir_option.patch
     # Windows-specific:
