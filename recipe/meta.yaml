@@ -13,7 +13,7 @@ source:
     - patches/0001-check-for-existence-of-type-before-setting.patch
 
 build:
-  number: 2
+  number: 3
   skip: True  # [win]
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
@@ -26,7 +26,7 @@ requirements:
     - libtool
     - make
     - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('cxx') }}  # [not (linux and aarch64)]
 
 test:
   commands:
