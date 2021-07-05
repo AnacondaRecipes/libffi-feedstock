@@ -17,7 +17,7 @@ source:
     - 0003-check-for-existence-of-type-before-setting.patch
 
 build:
-  number: 2
+  number: 3
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
