@@ -14,6 +14,7 @@ source:
     # Windows-specific:
     - 0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
+    - 0003-check-for-existence-of-type-before-setting.patch
 
 build:
   number: 2
