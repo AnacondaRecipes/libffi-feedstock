@@ -8,8 +8,8 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
-  sha256: 0acbca9fd9c0eeed7e5d9460ae2ea945d3f1f3d48e13a4c54da12c7e0d23c313
+  url: https://github.com/libffi/libffi/releases/download/v{{version}}/libffi-{{version}}.tar.gz
+  sha256: 540fb721619a6aba3bdeef7d940d8e9e0e6d2c193595bc243241b77ff9e93620
   patches:
     - 0001-arm64-changes-from-v3.3-patch.patch  # [osx]
 build:
