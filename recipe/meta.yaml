@@ -20,15 +20,17 @@ build:
 
 requirements:
   build:
-    - autotools_clang_conda              # [win]
+    - posix                              # [win]
     - make                               # [unix]
     - autoconf                           # [unix]
     - libtool                            # [unix]
     - patch                              # [unix]
+    - m2-patch                           # [win]
     - automake                           # [unix]
     - {{ posix }}texinfo
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }}                # [not win]
+    - {{ compiler('cxx') }}              # [not win]
+    - m2w64-gcc                          # [win]
   host:
   run:
 

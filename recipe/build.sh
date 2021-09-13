@@ -13,9 +13,13 @@ configure_args=(
     --includedir="${PREFIX}/include"
 )
 
-if [[ "$target_platform" != win-* ]]; then
+if [[ "$target_platform" == osx-arm64 ]]; then
   configure_args+=(--build=aarch64-apple-darwin20.0.0 --host=$HOST)
-else
+elif [["$target_platform" == osx-*  ]]; then
+  echo "osx ..."
+elif [["$target_platform" == linux-*  ]]; then
+  echo "linux ..."
+else  # windows case
   configure_args+=(--disable-static)
   export CPPFLAGS="${CPPFLAGS} -DFFI_BUILDING_DLL"
   export CFLAGS="${CFLAGS} -DFFI_BUILDING_DLL"
