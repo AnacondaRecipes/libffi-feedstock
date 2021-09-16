@@ -20,6 +20,7 @@ build:
 
 requirements:
   build:
+    - autotools_clang_conda              # [win]
     - posix                              # [win]
     - make                               # [unix]
     - autoconf                           # [unix]
