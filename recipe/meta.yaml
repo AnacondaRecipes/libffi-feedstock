@@ -1,5 +1,7 @@
 {% set name = "libffi" %}
 {% set version = "3.3" %}
+{% set p = 'm2-' if win else '' %}
+{% set n = 'm2w64-' if win else '' %}
 
 package:
   name: {{ name|lower }}
@@ -11,31 +13,39 @@ source:
   sha1: 8df6cb570c8d6596a67d1c0773bf00650154f7aa
   patches:
     - patches/0001-check-for-existence-of-type-before-setting.patch
+    #- patches/0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
+    #- patches/0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
 
 build:
   number: 2
-  skip: True  # [win]
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', max_pin='x.x') }}
 
 requirements:
   build:
-    - autoconf
-    - automake
-    - libtool
-    - make
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-
+    - {{ p }}autoconf
+    - automake   # [not win]
+    - {{ p }}libtool
+    - {{ p }}make
+    # - {{ n }}-automake1.15   # [win]
+    - {{ p }}automake-wrapper  # [win]
+    - {{ compiler('c') }}  # [not win]
+    - {{ compiler('cxx') }}  # [not win]
+    - {{ n }}toolchain  # [win]
+    - {{ p }}patch
+    - posix  # [win]
 test:
   commands:
     - test -e $PREFIX/lib/libffi.so  # [linux]
     - test -e $PREFIX/lib/libffi.a  # [unix]
     - test -e $PREFIX/lib/libffi.dylib  # [osx]
-    - test -e $PREFIX/include/ffi.h
-    - test -e $PREFIX/include/ffitarget.h
-
+    - test -e $PREFIX/include/ffi.h        # [unix]
+    - test -e $PREFIX/include/ffitarget.h  # [unix]
+    - if not exist %LIBRARY_BIN%\libffi-7.dll exit 1  # [win]
+    - if not exist %LIBRARY_INC%\ffi.h exit 1         # [win]
+    - if not exist %LIBRARY_INC%\ffitarget.h exit 1   # [win]
+    - if not exist %LIBRARY_LIB%\libffi.dll.a exit 1  # [win]
 about:
   home: https://sourceware.org/libffi/
   license: Custom
