@@ -12,6 +12,10 @@ source:
   sha256: 540fb721619a6aba3bdeef7d940d8e9e0e6d2c193595bc243241b77ff9e93620
   patches:
     - 0001-arm64-changes-from-v3.3-patch.patch  # [osx]
+    # Windows-specific:
+    - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
+    - win_cmake.patch        # [win]
+    - fix_w3264_masm.patch   # [win]
 build:
   number: 0
   run_exports:
@@ -20,15 +24,16 @@ build:
 
 requirements:
   build:
-    - autotools_clang_conda              # [win]
+    - cmake                              # [win]
     - make                               # [unix]
     - autoconf                           # [unix]
     - libtool                            # [unix]
-    - patch                              # [unix]
+    - {{ posix }}patch
     - automake                           # [unix]
-    - {{ posix }}texinfo
+    - {{ posix }}texinfo                 # [unix]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ posix }}sed                     # [unix]
   host:
   run:
 
@@ -46,7 +51,8 @@ test:
     - if not exist %LIBRARY_PREFIX%/lib/ffi.lib exit /b 1       # [win]
     - if not exist %LIBRARY_PREFIX%/include/ffi.h exit /b 1        # [win]
     - if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1  # [win]
-    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"        # [win]
+    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"        # [win64]
+    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp__ffi_type_void"       # [win32]
 
 about:
   home: https://sourceware.org/libffi/
