@@ -1,4 +1,4 @@
-{% set version = "3.3" %}
+{% set version = "3.4.2" %}
 {% set am_version = "1.15" %} # keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -8,31 +8,32 @@ package:
   version: {{ version }}
 
 source:
-  url: https://sourceware.org/pub/libffi/libffi-{{ version }}.tar.gz
-  # url: https://github.com/libffi/libffi/archive/v{{ version }}.tar.gz
-  sha256: 72fba7922703ddfa7a028d513ac15a85c8d54c8d67f55fa5a4802885dc652056
-  patches:  # [win or osx]
+  url: https://github.com/libffi/libffi/releases/download/v{{version}}/libffi-{{version}}.tar.gz
+  sha256: 540fb721619a6aba3bdeef7d940d8e9e0e6d2c193595bc243241b77ff9e93620
+  patches:
+    - 0001-arm64-changes-from-v3.3-patch.patch  # [osx]
     # Windows-specific:
-    - 0001-x86-MSVC-does-not-support-Complex-type.patch                # [win]
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
-    - 0003-libffi-3.3-arm64.patch                                      # [osx]
+    - win_cmake.patch        # [win]
+    - fix_w3264_masm.patch   # [win]
 build:
-  number: 2
+  number: 0
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
 
 requirements:
   build:
-    - autotools_clang_conda              # [win]
+    - cmake                              # [win]
     - make                               # [unix]
     - autoconf                           # [unix]
     - libtool                            # [unix]
-    - patch                              # [unix]
+    - {{ posix }}patch
     - automake                           # [unix]
-    - {{ posix }}texinfo
+    - {{ posix }}texinfo                 # [unix]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ posix }}sed                     # [unix]
   host:
   run:
 
@@ -50,7 +51,8 @@ test:
     - if not exist %LIBRARY_PREFIX%/lib/ffi.lib exit /b 1       # [win]
     - if not exist %LIBRARY_PREFIX%/include/ffi.h exit /b 1        # [win]
     - if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1  # [win]
-    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"        # [win]
+    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"        # [win64]
+    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp__ffi_type_void"       # [win32]
 
 about:
   home: https://sourceware.org/libffi/
