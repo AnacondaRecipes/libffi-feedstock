@@ -58,7 +58,7 @@ about:
   home: https://sourceware.org/libffi/
   license: MIT
   license_file: LICENSE
-  summary: A Portable Foreign Function Interface Library.
+  summary: A Portable Foreign Function Interface Library
 
   description: |
     The libffi library provides a portable, high level programming interface
