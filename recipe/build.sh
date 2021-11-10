@@ -38,3 +38,9 @@ make install
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
 
+# Make sure we provide old variant.  As in 3.4 no API change was introduced in coparison to 3.3
+# we will go with the assumption of being backward compatible.
+pushd $PREFIX/lib
+ln -s -f libffi.8.dylib libffi.7.${SHLIB_EXT}
+popd
+
