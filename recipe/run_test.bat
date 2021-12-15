@@ -6,7 +6,3 @@ if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1
 echo "platform name"
 echo %SUBDIR%
 if %SUBDIR%==win-64 (llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void" ) else (llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp__ffi_type_void")
-cd %LIBRARY_PREFIX%/testsuite/libffi.bhaible
-echo "Triggering libffi tests"
-cmake prefix=%LIBRARY_PREFIX%
-echo "completed triggering the tests"

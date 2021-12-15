@@ -43,6 +43,8 @@ test:
     - m2-grep     # [win]
     - make # [unix]
     - cmake # [win]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   source_files:
     - testsuite/libffi.bhaible
     - testsuite
