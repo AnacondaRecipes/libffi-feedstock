@@ -17,7 +17,7 @@ source:
     - win_cmake.patch        # [win]
     - fix_w3264_masm.patch   # [win]
 build:
-  number: 2
+  number: 3
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
@@ -41,18 +41,13 @@ test:
   requires:
     - llvm-tools  # [win]
     - m2-grep     # [win]
-  commands:
-    - test -e $PREFIX/lib/libffi${SHLIB_EXT}                       # [not win]
-    - test -e $PREFIX/lib/libffi.a                                 # [not win]
-    - test -e $PREFIX/include/ffi.h                                # [not win]
-    - test -e $PREFIX/include/ffitarget.h                          # [not win]
-    - if not exist %LIBRARY_PREFIX%/bin/ffi-7.dll exit /b 1        # [win]
-    - if not exist %LIBRARY_PREFIX%/lib/libffi.lib exit /b 1       # [win]
-    - if not exist %LIBRARY_PREFIX%/lib/ffi.lib exit /b 1       # [win]
-    - if not exist %LIBRARY_PREFIX%/include/ffi.h exit /b 1        # [win]
-    - if not exist %LIBRARY_PREFIX%/include/ffitarget.h exit /b 1  # [win]
-    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp_ffi_type_void"        # [win64]
-    - llvm-nm %LIBRARY_PREFIX%/lib/libffi.lib | grep "__imp__ffi_type_void"       # [win32]
+    - make # [unix]
+    - cmake # [win]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  source_files:
+    - testsuite/libffi.bhaible
+    - testsuite
 
 about:
   home: https://sourceware.org/libffi/
