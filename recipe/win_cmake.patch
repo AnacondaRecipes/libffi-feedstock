@@ -2,7 +2,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 0000000..26cc2fd
 --- /dev/null
 +++ b/CMakeLists.txt
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,61 @@
 +cmake_minimum_required(VERSION 2.8.8)
 +project(libffi C)
 +
@@ -60,11 +60,15 @@ index 0000000..26cc2fd
 +    ${CMAKE_BINARY_DIR}/include/ffi.h
 +    ${CMAKE_BINARY_DIR}/include/ffitarget.h
 +    DESTINATION include)
++
++install(FILES
++    ${CMAKE_LIBRARY_DIR}/pkgconfig/libffi.pc
++    DESTINATION lib/pkgconfig)
 diff --git a/configure_options.cmake b/configure_options.cmake
 index 0000000..849231c
 --- /dev/null
 +++ b/configure_options.cmake
-@@ -0,0 +1,335 @@
+@@ -0,0 +1,341 @@
 +include(CheckCSourceCompiles)
 +include(CheckCSourceRuns)
 +include(CheckFunctionExists)
@@ -87,6 +91,11 @@ index 0000000..849231c
 +set(PACKAGE_VERSION ${VERSION})
 +set(TARGET ${TARGET_PLATFORM})
 +set(LT_OBJDIR .libs/)
++set(prefix ../..)
++set(exec_prefix \${prefix})
++set(libdir \${exec_prefix}/lib)
++set(toolexeclibdir \${exec_prefix}/lib)
++set(includedir \${prefix}/include)
 +
 +check_type_size (size_t SIZEOF_SIZE_T)
 +
@@ -376,6 +385,7 @@ index 0000000..849231c
 +
 +configure_file(include/ffi.h.in ${CMAKE_BINARY_DIR}/include/ffi.h)
 +configure_file(include/fficonfig.h.in ${CMAKE_BINARY_DIR}/include/fficonfig.h)
++configure_file(libffi.pc.in ${CMAKE_LIBRARY_DIR}/pkgconfig/libffi.pc)
 +
 +foreach(ASM_PATH IN LISTS WIN_ASSEMBLY_LIST)
 +    get_filename_component(ASM_FILENAME "${ASM_PATH}" NAME_WE)
