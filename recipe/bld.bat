@@ -11,6 +11,7 @@ cmake -G "NMake Makefiles" ^
   -D CMAKE_PREFIX_PATH=%LIBRARY_PREFIX% ^
   -D CMAKE_INSTALL_PREFIX:PATH=%LIBRARY_PREFIX% ^
   -D BUILD_SHARED_LIBS:BOOL=ON ^
+  -D VERSION=%PKG_VERSION% ^
   ..
 
 echo "configured ..."

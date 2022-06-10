@@ -17,7 +17,7 @@ source:
     - win_cmake.patch        # [win]
     - fix_w3264_masm.patch   # [win]
 build:
-  number: 3
+  number: 4
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
@@ -53,8 +53,8 @@ about:
   home: https://sourceware.org/libffi/
   license: MIT
   license_file: LICENSE
+  license_family: MIT
   summary: A Portable Foreign Function Interface Library
-
   description: |
     The libffi library provides a portable, high level programming interface
     to various calling conventions. This allows a programmer to call any
