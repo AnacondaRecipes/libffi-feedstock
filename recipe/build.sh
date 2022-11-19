@@ -7,7 +7,10 @@ cd $SRC_DIR
 # work-a-round for cyclic dependencies on OSX
 if [[ $target_platform == osx-* ]]; then
   conda create -p $SRC_DIR/compilers clang_${target_platform} clangxx_${target_platform} --yes --quiet
-  export PATH=$PWD/compilers/bin:$PATH
+  cp -fr compilers/* $BUILD_PREFIX/. 2>/dev/null || true
+  # do manual activation ...
+  . $BUILD_PREFIX//etc/conda/activate.d/activate_clang_${target_platform}.sh
+  . $BUILD_PREFIX/etc/conda/activate.d/activate_clangxx_${target_platform}.sh
 fi
 
 export CFLAGS="${CFLAGS//-fvisibility=+([! ])/}"
@@ -42,6 +45,12 @@ fi
 make -j${CPU_COUNT} ${VERBOSE_AT}
 make check
 make install
+
+if [[ $target_platform == osx-* ]]; then
+  # do manual deactivation ...
+  . $BUILD_PREFIX/etc/conda/deactivate.d/deactivate_clang_${target_platform}.sh
+  . $BUILD_PREFIX/etc/conda/deactivate.d/deactivate_clangxx_${target_platform}.sh
+fi
 
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
