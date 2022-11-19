@@ -2,6 +2,14 @@
 
 set -ex
 
+cd $SRC_DIR
+
+# work-a-round for cyclic dependencies on OSX
+if [[ $target_platform == osx-* ]]; then
+  conda create -p $SRC_DIR/compilers conda create -p $SRC_DIR/compilers clang_${target_platform} clangxx_${target_platform} --yes --quiet
+  export PATH=$PWD/compilers/bin:$PATH
+fi
+
 export CFLAGS="${CFLAGS//-fvisibility=+([! ])/}"
 export CXXFLAGS="${CXXFLAGS//-fvisibility=+([! ])/}"
 
