@@ -43,8 +43,10 @@ test:
     - m2-grep     # [win]
     - make # [unix]
     - cmake # [win]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    # no compile tests here, as used compiler might be not upward-compatible
+    # needs to be fixed
+    - {{ compiler('c') }}    # [not osx]
+    - {{ compiler('cxx') }}  # [not osx]
   source_files:
     - testsuite/libffi.bhaible
     - testsuite
