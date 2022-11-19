@@ -41,6 +41,13 @@ rm -rf ${PREFIX}/share/info/dir
 # Make sure we provide old variant.  As in 3.4 no API change was introduced in coparison to 3.3
 # we will go with the assumption of being backward compatible.
 pushd $PREFIX/lib
+# make sure we address also <lib>.so<.number>, and don't produce dead links
+if [[ -f libffi${SHLIB_EXT}.8 ]]; then
+  ln -s libffi${SHLIB_EXT}.8 libffi${SHLIB_EXT}.7
+  if [[ ! -f libffi.8{SHLIB_EXT} ]]; then
+    ln -s libffi${SHLIB_EXT}.8 libffi.8${SHLIB_EXT}
+  fi
+fi
 ln -s -f libffi.8${SHLIB_EXT} libffi.7${SHLIB_EXT}
 popd
 
