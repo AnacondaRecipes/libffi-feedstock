@@ -17,7 +17,7 @@ source:
     - win_cmake.patch        # [win]
     - fix_w3264_masm.patch   # [win]
 build:
-  number: 4
+  number: 5
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
@@ -31,8 +31,8 @@ requirements:
     - {{ posix }}patch
     - automake                           # [unix]
     - {{ posix }}texinfo                 # [unix]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }}                # [not osx]
+    - {{ compiler('cxx') }}              # [not osx]
     - {{ posix }}sed                     # [unix]
   host:
   run:
@@ -43,8 +43,10 @@ test:
     - m2-grep     # [win]
     - make # [unix]
     - cmake # [win]
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    # no compile tests here, as used compiler might be not upward-compatible
+    # needs to be fixed
+    - {{ compiler('c') }}    # [not osx]
+    - {{ compiler('cxx') }}  # [not osx]
   source_files:
     - testsuite/libffi.bhaible
     - testsuite

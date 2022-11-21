@@ -6,5 +6,9 @@ test -e $PREFIX/include/ffi.h
 test -e $PREFIX/include/ffitarget.h
 cd $PWD/testsuite/libffi.bhaible
 echo "Triggering libffi tests"
-make prefix=$PREFIX CC=$CC
+if [[ $(uname) == Darwin ]]; then
+  echo "ignore compile test due possible incompatiblity ..."
+else
+  make prefix=$PREFIX CC=$CC
+fi
 echo "completed triggering the tests"
