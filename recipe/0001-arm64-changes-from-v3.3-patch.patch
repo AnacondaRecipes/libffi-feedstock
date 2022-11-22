@@ -1,29 +1,40 @@
-Index: work_failed_provide/src/aarch64/ffi.c
-===================================================================
---- work_failed_provide.orig/src/aarch64/ffi.c
-+++ work_failed_provide/src/aarch64/ffi.c
-@@ -715,12 +715,14 @@ ffi_call_int (ffi_cif *cif, void (*fn)(v
+From a6ef415fa95661b67017f1bdc32d8f98db7d9c44 Mon Sep 17 00:00:00 2001
+From: Daniel Holth <dholth@anaconda.com>
+Date: Fri, 27 Aug 2021 15:55:36 -0400
+Subject: [PATCH] arm64 changes merged from v3.3 arm64-changes patch
+
+---
+ src/aarch64/ffi.c | 29 +++++++++++++++++---
+ src/closures.c    | 67 ++++++++++++++++++++++++++++++++++++++++-------
+ src/x86/ffi64.c   |  6 +++++
+ 3 files changed, 89 insertions(+), 13 deletions(-)
+
+diff --git a/src/aarch64/ffi.c b/src/aarch64/ffi.c
+index 5c85fcd..3ae983b 100644
+--- a/src/aarch64/ffi.c
++++ b/src/aarch64/ffi.c
+@@ -662,12 +662,13 @@ ffi_call_int (ffi_cif *cif, void (*fn)(void), void *orig_rvalue,
  		state.ngrn = N_X_ARG_REG;
  		/* Note that the default abi extends each argument
  		   to a full 64-bit slot, while the iOS abi allocates
 -		   only enough space. */
 +		   only enough space, except for variadic arguments. */
  #ifdef __APPLE__
- 		memcpy(d, a, s);
+-		memcpy(d, a, s);
 -#else
 -		*(ffi_arg *)d = ext;
-+                if (!state.allocating_variadic)
-+                  memcpy(d, a, s);
-+                else
++		if (!state.allocating_variadic)
++		  memcpy(d, a, s);
++		else
  #endif
-+		*(ffi_arg *)d = ext;
++		  *(ffi_arg *)d = ext;
  	      }
  	  }
  	  break;
-@@ -867,7 +869,11 @@ ffi_prep_closure_loc (ffi_closure *closu
- #  ifdef HAVE_PTRAUTH
+@@ -813,7 +814,11 @@ ffi_prep_closure_loc (ffi_closure *closure,
+ #ifdef HAVE_PTRAUTH
    codeloc = ptrauth_auth_data(codeloc, ptrauth_key_function_pointer, 0);
- #  endif
+ #endif
 +#ifdef FFI_TRAMPOLINE_WHOLE_DYLIB
 +  void **config = (void **)((uint8_t *)codeloc - 2*PAGE_MAX_SIZE);
 +#else
@@ -31,8 +42,8 @@ Index: work_failed_provide/src/aarch64/ffi.c
 +#endif
    config[0] = closure;
    config[1] = start;
- # endif
-@@ -920,6 +926,22 @@ out:
+ #endif
+@@ -864,6 +869,22 @@ out:
    return FFI_OK;
  }
  
@@ -55,11 +66,11 @@ Index: work_failed_provide/src/aarch64/ffi.c
  #ifdef FFI_GO_CLOSURES
  extern void ffi_go_closure_SYSV (void) FFI_HIDDEN;
  extern void ffi_go_closure_SYSV_V (void) FFI_HIDDEN;
-Index: work_failed_provide/src/closures.c
-===================================================================
---- work_failed_provide.orig/src/closures.c
-+++ work_failed_provide/src/closures.c
-@@ -169,6 +169,14 @@ ffi_tramp_is_present (__attribute__((unu
+diff --git a/src/closures.c b/src/closures.c
+index f7bead6..460606f 100644
+--- a/src/closures.c
++++ b/src/closures.c
+@@ -164,7 +164,13 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
  #include <stdio.h>
  #include <stdlib.h>
  
@@ -68,13 +79,12 @@ Index: work_failed_provide/src/closures.c
 +#include <dispatch/dispatch.h>
 +#include <dlfcn.h>
 +#else
-+ extern void *ffi_closure_trampoline_table_page;
-+#endif
-+
  extern void *ffi_closure_trampoline_table_page;
++#endif
  
  typedef struct ffi_trampoline_table ffi_trampoline_table;
-@@ -197,6 +205,21 @@ struct ffi_trampoline_table_entry
+ typedef struct ffi_trampoline_table_entry ffi_trampoline_table_entry;
+@@ -192,6 +198,21 @@ struct ffi_trampoline_table_entry
  /* Total number of trampolines that fit in one trampoline table */
  #define FFI_TRAMPOLINE_COUNT (PAGE_MAX_SIZE / FFI_TRAMPOLINE_SIZE)
  
@@ -86,21 +96,31 @@ Index: work_failed_provide/src/closures.c
 + * arm64 (modern): Allocate three pages -- a config page and two placeholders for the trampoline dylib
 + */
 +#ifdef FFI_TRAMPOLINE_WHOLE_DYLIB
-+  #define FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT 3
-+  #define FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET PAGE_MAX_SIZE
++#define FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT 3
++#define FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET PAGE_MAX_SIZE
 +#else
-+  #define FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT 2
-+  #define FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET 0
++#define FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT 2
++#define FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET 0
 +#endif
 +
  static pthread_mutex_t ffi_trampoline_lock = PTHREAD_MUTEX_INITIALIZER;
  static ffi_trampoline_table *ffi_trampoline_tables = NULL;
  
-@@ -214,30 +237,49 @@ ffi_trampoline_table_alloc (void)
+@@ -207,35 +228,63 @@ ffi_trampoline_table_alloc (void)
+   kern_return_t kt;
+   uint16_t i;
  
-   /* Allocate two pages -- a config page and a placeholder page */
+-  /* Allocate two pages -- a config page and a placeholder page */
    config_page = 0x0;
 -  kt = vm_allocate (mach_task_self (), &config_page, PAGE_MAX_SIZE * 2,
++  /* The entire allocation is:
++   *    config_page
++   *    trampoline_segment
++   *
++   * trampoline_segment is:
++   *    trampoline dylib mach-o header (if FFI_TRAMPOLINE_WHOLE_DYLIB)
++   *    trampoline page
++   */
 +  kt = vm_allocate (mach_task_self (), &config_page, FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT * PAGE_MAX_SIZE,
  		    VM_FLAGS_ANYWHERE);
    if (kt != KERN_SUCCESS)
@@ -145,20 +165,25 @@ Index: work_failed_provide/src/closures.c
 +  /* Remap the trampoline table on top of the placeholder page */
 +  vm_address_t trampoline_segment = config_page + PAGE_MAX_SIZE;
 +  kt = vm_remap (mach_task_self(), &trampoline_segment, trampoline_segment_size, 0x0,
-+                VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE, mach_task_self(), trampoline_segment_template,
++		 VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE, mach_task_self(), trampoline_segment_template,
  		 FALSE, &cur_prot, &max_prot, VM_INHERIT_SHARE);
-   if (kt != KERN_SUCCESS)
+   if (kt != KERN_SUCCESS || !(cur_prot & VM_PROT_EXECUTE))
      {
 -      vm_deallocate (mach_task_self (), config_page, PAGE_MAX_SIZE * 2);
 +      vm_deallocate (mach_task_self (), config_page, FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT * PAGE_MAX_SIZE);
        return NULL;
      }
  
-Index: work_failed_provide/src/x86/ffi64.c
-===================================================================
---- work_failed_provide.orig/src/x86/ffi64.c
-+++ work_failed_provide/src/x86/ffi64.c
-@@ -809,6 +809,18 @@ out:
++  trampoline_page = trampoline_segment + FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET;
++
+   /* We have valid trampoline and config pages */
+   table = calloc (1, sizeof (ffi_trampoline_table));
+   table->free_count = FFI_TRAMPOLINE_COUNT;
+diff --git a/src/x86/ffi64.c b/src/x86/ffi64.c
+index 438b374..8e47843 100644
+--- a/src/x86/ffi64.c
++++ b/src/x86/ffi64.c
+@@ -788,6 +788,12 @@ out:
    return FFI_OK;
  }
  
@@ -167,13 +192,10 @@ Index: work_failed_provide/src/x86/ffi64.c
 +{
 +    return (ffi_closure *) code;
 +}
-+
-+/* Apple ernamed ... */
-+ffi_closure *ffi_find_closure_for_code_np(void *code)
-+{
-+  return ffi_find_closure_for_code(code);
-+}
-+
++ ffi_closure *ffi_find_closure_for_code_np(void *code) { return ffi_find_closure_for_code(code); }  /* Apple renamed ... */
  int FFI_HIDDEN
  ffi_closure_unix64_inner(ffi_cif *cif,
  			 void (*fun)(ffi_cif*, void*, void**, void*),
+-- 
+2.32.0
+
