@@ -1,4 +1,4 @@
-{% set version = "3.4.2" %}
+{% set version = "3.4.4" %}
 {% set am_version = "1.15" %} # keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -9,7 +9,7 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/releases/download/v{{version}}/libffi-{{version}}.tar.gz
-  sha256: 540fb721619a6aba3bdeef7d940d8e9e0e6d2c193595bc243241b77ff9e93620
+  sha256: d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676
   patches:
     - 0001-arm64-changes-from-v3.3-patch.patch  # [osx]
     # Windows-specific:
