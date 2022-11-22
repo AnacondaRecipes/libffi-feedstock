@@ -14,6 +14,7 @@ source:
     - 0001-arm64-changes-from-v3.3-patch.patch  # [osx]
     # Windows-specific:
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
+    - 0003-autoconf.patch  # [linux]
     - win_cmake.patch        # [win]
     - fix_w3264_masm.patch   # [win]
 build:
