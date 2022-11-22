@@ -1,4 +1,4 @@
-{% set version = "3.4.4" %}
+{% set version = "3.4.2" %}
 {% set am_version = "1.15" %} # keep synchronized with build.sh
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -9,16 +9,16 @@ package:
 
 source:
   url: https://github.com/libffi/libffi/releases/download/v{{version}}/libffi-{{version}}.tar.gz
-  sha256: d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676
+  sha256: 540fb721619a6aba3bdeef7d940d8e9e0e6d2c193595bc243241b77ff9e93620
   patches:
     - 0001-arm64-changes-from-v3.3-patch.patch  # [osx]
     # Windows-specific:
     - 0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
-    - 0003-autoconf.patch  # [linux]
     - win_cmake.patch        # [win]
     - fix_w3264_masm.patch   # [win]
+    - 0004-LIBFFI_CLOSURE.patch  # [linux]
 build:
-  number: 0
+  number: 6
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
