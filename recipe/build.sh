@@ -31,8 +31,7 @@ if [[ "$target_platform" == osx-* ]]; then
   export CPP="${CC} -E"
   export CXXCPP="${CXX} -E"
 else
- echo don't run autoreconf -vfi
- # autoreconf -vfi
+ autoreconf -vfi
 fi
 
 if [[ "$target_platform" == linux* ]]; then
