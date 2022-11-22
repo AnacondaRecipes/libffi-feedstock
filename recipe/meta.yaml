@@ -17,7 +17,7 @@ source:
     - win_cmake.patch        # [win]
     - fix_w3264_masm.patch   # [win]
 build:
-  number: 5
+  number: 0
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', "x.x") }}
