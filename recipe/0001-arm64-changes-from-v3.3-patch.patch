@@ -10,10 +10,10 @@ Subject: [PATCH] arm64 changes merged from v3.3 arm64-changes patch
  3 files changed, 89 insertions(+), 13 deletions(-)
 
 diff --git a/src/aarch64/ffi.c b/src/aarch64/ffi.c
-index 5c85fcd..3ae983b 100644
+index 6544ac0..3f936d3 100644
 --- a/src/aarch64/ffi.c
 +++ b/src/aarch64/ffi.c
-@@ -662,12 +662,13 @@ ffi_call_int (ffi_cif *cif, void (*fn)(void), void *orig_rvalue,
+@@ -715,12 +715,13 @@ ffi_call_int (ffi_cif *cif, void (*fn)(void), void *orig_rvalue,
  		state.ngrn = N_X_ARG_REG;
  		/* Note that the default abi extends each argument
  		   to a full 64-bit slot, while the iOS abi allocates
@@ -31,19 +31,19 @@ index 5c85fcd..3ae983b 100644
  	      }
  	  }
  	  break;
-@@ -813,7 +814,11 @@ ffi_prep_closure_loc (ffi_closure *closure,
- #ifdef HAVE_PTRAUTH
+@@ -867,7 +868,11 @@ ffi_prep_closure_loc (ffi_closure *closure,
+ #  ifdef HAVE_PTRAUTH
    codeloc = ptrauth_auth_data(codeloc, ptrauth_key_function_pointer, 0);
- #endif
-+#ifdef FFI_TRAMPOLINE_WHOLE_DYLIB
+ #  endif
++#  ifdef FFI_TRAMPOLINE_WHOLE_DYLIB
 +  void **config = (void **)((uint8_t *)codeloc - 2*PAGE_MAX_SIZE);
-+#else
++#  else
    void **config = (void **)((uint8_t *)codeloc - PAGE_MAX_SIZE);
-+#endif
++#  endif
    config[0] = closure;
    config[1] = start;
- #endif
-@@ -864,6 +869,22 @@ out:
+ # endif
+@@ -920,6 +925,22 @@ out:
    return FFI_OK;
  }
  
@@ -67,10 +67,10 @@ index 5c85fcd..3ae983b 100644
  extern void ffi_go_closure_SYSV (void) FFI_HIDDEN;
  extern void ffi_go_closure_SYSV_V (void) FFI_HIDDEN;
 diff --git a/src/closures.c b/src/closures.c
-index f7bead6..460606f 100644
+index 9aafbec..af1c3b8 100644
 --- a/src/closures.c
 +++ b/src/closures.c
-@@ -164,7 +164,13 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
+@@ -168,7 +168,13 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
  #include <stdio.h>
  #include <stdlib.h>
  
@@ -84,7 +84,7 @@ index f7bead6..460606f 100644
  
  typedef struct ffi_trampoline_table ffi_trampoline_table;
  typedef struct ffi_trampoline_table_entry ffi_trampoline_table_entry;
-@@ -192,6 +198,21 @@ struct ffi_trampoline_table_entry
+@@ -196,6 +202,21 @@ struct ffi_trampoline_table_entry
  /* Total number of trampolines that fit in one trampoline table */
  #define FFI_TRAMPOLINE_COUNT (PAGE_MAX_SIZE / FFI_TRAMPOLINE_SIZE)
  
@@ -106,7 +106,7 @@ index f7bead6..460606f 100644
  static pthread_mutex_t ffi_trampoline_lock = PTHREAD_MUTEX_INITIALIZER;
  static ffi_trampoline_table *ffi_trampoline_tables = NULL;
  
-@@ -207,35 +228,63 @@ ffi_trampoline_table_alloc (void)
+@@ -211,35 +232,63 @@ ffi_trampoline_table_alloc (void)
    kern_return_t kt;
    uint16_t i;
  
@@ -167,7 +167,7 @@ index f7bead6..460606f 100644
 +  kt = vm_remap (mach_task_self(), &trampoline_segment, trampoline_segment_size, 0x0,
 +		 VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE, mach_task_self(), trampoline_segment_template,
  		 FALSE, &cur_prot, &max_prot, VM_INHERIT_SHARE);
-   if (kt != KERN_SUCCESS || !(cur_prot & VM_PROT_EXECUTE))
+   if (kt != KERN_SUCCESS)
      {
 -      vm_deallocate (mach_task_self (), config_page, PAGE_MAX_SIZE * 2);
 +      vm_deallocate (mach_task_self (), config_page, FFI_TRAMPOLINE_ALLOCATION_PAGE_COUNT * PAGE_MAX_SIZE);
@@ -176,14 +176,26 @@ index f7bead6..460606f 100644
  
 +  trampoline_page = trampoline_segment + FFI_TRAMPOLINE_PAGE_SEGMENT_OFFSET;
 +
+   if (!(cur_prot & VM_PROT_EXECUTE))
+     {
+       /* If VM_PROT_EXECUTE isn't set on the remapped trampoline page, set it */
+       kt = vm_protect (mach_task_self (), trampoline_page, PAGE_MAX_SIZE,
+          FALSE, cur_prot | VM_PROT_EXECUTE);
+       if (kt != KERN_SUCCESS)
+         {
+           vm_deallocate (mach_task_self (), config_page, PAGE_MAX_SIZE * 2);
+           return NULL;
+         }
+     }
+
    /* We have valid trampoline and config pages */
    table = calloc (1, sizeof (ffi_trampoline_table));
    table->free_count = FFI_TRAMPOLINE_COUNT;
 diff --git a/src/x86/ffi64.c b/src/x86/ffi64.c
-index 438b374..8e47843 100644
+index 6a8e37f..a3d51bc 100644
 --- a/src/x86/ffi64.c
 +++ b/src/x86/ffi64.c
-@@ -788,6 +788,12 @@ out:
+@@ -809,6 +809,12 @@ out:
    return FFI_OK;
  }
  
