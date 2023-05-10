@@ -2,7 +2,7 @@ diff --git a/configure_options.cmake b/configure_options.cmake
 index 849231c..ceb6539 100644
 --- a/configure_options.cmake
 +++ b/configure_options.cmake
-@@ -74,6 +74,7 @@ elseif(TARGET_PLATFORM STREQUAL X86_64)
+@@ -79,6 +79,7 @@ elseif(TARGET_PLATFORM STREQUAL X86_64)
  elseif(TARGET_PLATFORM MATCHES X86.*)
      if(MSVC)
          list(APPEND WIN_ASSEMBLY_LIST src/x86/sysv_intel.S)
@@ -10,7 +10,7 @@ index 849231c..ceb6539 100644
          enable_language(ASM_MASM)
      else()
          list(APPEND SOURCES_LIST src/x86/sysv.S)
-@@ -323,13 +324,17 @@ foreach(ASM_PATH IN LISTS WIN_ASSEMBLY_LIST)
+@@ -329,13 +330,17 @@ foreach(ASM_PATH IN LISTS WIN_ASSEMBLY_LIST)
  
      set_source_files_properties("${CMAKE_BINARY_DIR}/${ASM_FILENAME}.asm" PROPERTIES GENERATED TRUE)
  

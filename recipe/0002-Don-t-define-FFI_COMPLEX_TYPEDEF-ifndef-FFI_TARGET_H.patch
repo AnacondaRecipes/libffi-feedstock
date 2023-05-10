@@ -12,7 +12,7 @@ diff --git a/src/types.c b/src/types.c
 index 7e80aec..e4b024c 100644
 --- a/src/types.c
 +++ b/src/types.c
-@@ -44,6 +44,7 @@ maybe_const ffi_type ffi_type_##name = {	\
+@@ -45,6 +45,7 @@ maybe_const ffi_type ffi_type_##name = {	\
    id, NULL					\
  }
  
@@ -20,14 +20,14 @@ index 7e80aec..e4b024c 100644
  #define FFI_COMPLEX_TYPEDEF(name, type, maybe_const)	\
  static ffi_type *ffi_elements_complex_##name [2] = {	\
  	(ffi_type *)(&ffi_type_##name), NULL		\
-@@ -58,6 +59,7 @@ maybe_const ffi_type ffi_type_complex_##name = {	\
+@@ -60,6 +61,7 @@ maybe_const ffi_type ffi_type_complex_##name = {	\
    FFI_TYPE_COMPLEX,					\
    (ffi_type **)ffi_elements_complex_##name		\
  }
 +#endif
  
  /* Size and alignment are fake here. They must not be 0. */
- const ffi_type ffi_type_void = {
+ FFI_EXTERN const ffi_type ffi_type_void = {
 -- 
 2.8.2
 
