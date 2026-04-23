@@ -32,8 +32,8 @@ requirements:
     - {{ posix }}patch
     - automake                           # [unix]
     - {{ posix }}texinfo                 # [unix]
-    - {{ compiler('c') }}                # [not osx]
-    - {{ compiler('cxx') }}              # [not osx]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - {{ posix }}sed                     # [unix]
   host:
   run:
@@ -46,8 +46,8 @@ test:
     - cmake # [win]
     # no compile tests here, as used compiler might be not upward-compatible
     # needs to be fixed
-    - {{ compiler('c') }}    # [not osx]
-    - {{ compiler('cxx') }}  # [not osx]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   source_files:
     - testsuite/libffi.bhaible
     - testsuite
