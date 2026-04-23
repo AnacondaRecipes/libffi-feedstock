@@ -6,7 +6,10 @@ cd $SRC_DIR
 
 # work-a-round for cyclic dependencies on OSX
 if [[ $target_platform == osx-* ]]; then
-  conda create -p $SRC_DIR/compilers clang_${target_platform} clangxx_${target_platform} --yes --quiet
+  # Explicitly pass `-c defaults` because conda-build is invoked with
+  # `--override-channels`, which leaves the inner `conda create` without
+  # any configured channels and fails with NoChannelsConfiguredError.
+  conda create -p $SRC_DIR/compilers -c defaults clang_${target_platform} clangxx_${target_platform} --yes --quiet
   cp -fr compilers/* $BUILD_PREFIX/. 2>/dev/null || true
   # do manual activation ...
   . $BUILD_PREFIX/etc/conda/activate.d/activate_clang_${target_platform}.sh
