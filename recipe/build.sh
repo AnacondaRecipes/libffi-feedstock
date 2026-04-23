@@ -43,11 +43,17 @@ cd _build
 
 ../configure "${configure_args[@]}" || { cat config.log; exit 1;}
 
-make -j${CPU_COUNT} ${VERBOSE_AT}
+echo "===== STEP: configure done, starting make ====="
+make -j1 V=1
+echo "===== STEP: make done, starting make install ====="
 # make check
-make install
+make V=1 install
+echo "===== STEP: make install done ====="
 
 cd ..
+
+echo "===== STEP: listing PREFIX/lib ====="
+ls -la "${PREFIX}/lib" || true
 
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
