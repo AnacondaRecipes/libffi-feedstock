@@ -44,10 +44,20 @@ cd _build
 ../configure "${configure_args[@]}" || { cat config.log; exit 1;}
 
 echo "===== STEP: configure done, starting make ====="
-make -j1 V=1
+if ! make -j1 V=1 > make.log 2>&1; then
+    rc=$?
+    echo "===== MAKE FAILED with exit code $rc, last 300 lines: ====="
+    tail -n 300 make.log
+    exit $rc
+fi
 echo "===== STEP: make done, starting make install ====="
 # make check
-make V=1 install
+if ! make V=1 install > install.log 2>&1; then
+    rc=$?
+    echo "===== MAKE INSTALL FAILED with exit code $rc, last 300 lines: ====="
+    tail -n 300 install.log
+    exit $rc
+fi
 echo "===== STEP: make install done ====="
 
 cd ..
