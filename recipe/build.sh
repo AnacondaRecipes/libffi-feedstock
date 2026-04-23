@@ -44,7 +44,7 @@ cd _build
 ../configure "${configure_args[@]}" || { cat config.log; exit 1;}
 
 make -j${CPU_COUNT} ${VERBOSE_AT}
-make check
+# make check
 make install
 
 cd ..

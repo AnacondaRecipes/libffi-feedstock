@@ -19,6 +19,7 @@ source:
     - 0004-LIBFFI_CLOSURE.patch  # [linux]
 build:
   number: 2
+  skip: true  # [not osx]
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', max_pin='x.x') }}
