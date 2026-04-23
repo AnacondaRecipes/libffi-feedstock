@@ -16,6 +16,10 @@ fi
 configure_args=(
     --disable-debug
     --disable-dependency-tracking
+    # The non-PIC build of src/aarch64/sysv.S fails with
+    # "invalid CFI advance_loc expression" on the libtool static-object pass
+    # under newer clang on osx-arm64. Consumers of libffi (Python, glib, ...)
+    # only need the shared library, so skip the static build entirely.
     --disable-static
     --prefix="${PREFIX}"
     --includedir="${PREFIX}/include"
@@ -31,11 +35,19 @@ if [[ "$target_platform" == linux* ]]; then
   sed -i 's:@toolexeclibdir@:${libdir}:g' libffi.pc.in
 fi
 
-./configure "${configure_args[@]}" || { cat config.log; exit 1;}
+# Build out-of-tree to avoid libffi's auto-builddir feature, which re-execs
+# configure into a per-host subdir and races against our parallel make,
+# causing spurious CFI errors when assembling src/aarch64/sysv.S.
+mkdir -p _build
+cd _build
+
+../configure "${configure_args[@]}" || { cat config.log; exit 1;}
 
 make -j${CPU_COUNT} ${VERBOSE_AT}
 make check
 make install
+
+cd ..
 
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
