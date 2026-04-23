@@ -53,7 +53,7 @@ test:
     - testsuite
 
 about:
-  home: https://sourceware.org/libffi/
+  home: https://sourceware.org/libffi
   license: MIT
   license_file: LICENSE
   license_family: MIT
@@ -62,7 +62,7 @@ about:
     The libffi library provides a portable, high level programming interface
     to various calling conventions. This allows a programmer to call any
     function specified by a call interface description at run-time.
-  doc_url: https://sourceware.org/libffi/
+  doc_url: https://sourceware.org/libffi
   dev_url: https://github.com/libffi/libffi
 
 extra:

@@ -16,6 +16,7 @@ fi
 configure_args=(
     --disable-debug
     --disable-dependency-tracking
+    --disable-static
     --prefix="${PREFIX}"
     --includedir="${PREFIX}/include"
     --build=$BUILD
