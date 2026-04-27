@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ex
+shopt -s extglob
 
 cd $SRC_DIR
 
@@ -46,7 +47,7 @@ pushd $PREFIX/lib
 # make sure we address also <lib>.so<.number>, and don't produce dead links
 if [[ -f libffi${SHLIB_EXT}.8 ]]; then
   ln -s libffi${SHLIB_EXT}.8 libffi${SHLIB_EXT}.7
-  if [[ ! -f libffi.8{SHLIB_EXT} ]]; then
+  if [[ ! -f libffi.8${SHLIB_EXT} ]]; then
     ln -s libffi${SHLIB_EXT}.8 libffi.8${SHLIB_EXT}
   fi
 fi

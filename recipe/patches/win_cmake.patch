@@ -4,7 +4,7 @@ index 0000000..26cc2fd
 --- /dev/null
 +++ b/CMakeLists.txt
 @@ -0,0 +1,61 @@
-+cmake_minimum_required(VERSION 2.8.8)
++cmake_minimum_required(VERSION 3.5)
 +project(libffi C)
 +
 +set(SOURCES_LIST
