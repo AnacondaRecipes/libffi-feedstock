@@ -11,7 +11,6 @@ source:
   url: https://github.com/libffi/libffi/releases/download/v{{version}}/libffi-{{version}}.tar.gz
   sha256: bc9842a18898bfacb0ed1252c4febcc7e78fa139fd27fdc7a3e30d9d9356119b
   patches:
-    - patches/0002-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch  # [win]
     - patches/win_cmake.patch                                                  # [win]
     - patches/fix_w3264_masm.patch                                             # [win]
     - patches/0004-LIBFFI_CLOSURE.patch                                        # [linux]
@@ -31,13 +30,11 @@ requirements:
     - autoconf                           # [unix]
     - libtool                            # [unix]
     - automake                           # [unix]
-  host:
-  run:
 
 test:
   requires:
-    - llvm-tools  # [win]
-    - m2-grep     # [win]
+    - llvm-tools     # [win]
+    - msys2-grep     # [win]
     - make # [unix]
     - cmake # [win]
     # no compile tests here, as used compiler might be not upward-compatible
