@@ -1,33 +1,29 @@
 #!/bin/bash
 
 set -ex
-shopt -s extglob
 
 cd $SRC_DIR
 
 export CFLAGS="${CFLAGS//-fvisibility=+([! ])/}"
 export CXXFLAGS="${CXXFLAGS//-fvisibility=+([! ])/}"
 
-if [[ "$target_platform" == osx-* ]]; then
-  export CFLAGS="${CFLAGS} -Wno-deprecated-declarations"
-  export CXXFLAGS="${CXXFLAGS} -Wno-deprecated-declarations"
-fi
-
 configure_args=(
     --disable-debug
     --disable-dependency-tracking
-    # The non-PIC build of src/aarch64/sysv.S fails with
-    # "invalid CFI advance_loc expression" on the libtool static-object pass
-    # under newer clang on osx-arm64. Consumers of libffi (Python, glib, ...)
-    # only need the shared library, so skip the static build entirely.
-    --disable-static
     --prefix="${PREFIX}"
     --includedir="${PREFIX}/include"
-    --build=$BUILD
-    --host=$HOST
 )
 
-autoreconf -vfi
+configure_args+=(--build=$BUILD --host=$HOST)
+
+if [[ "$target_platform" == osx-* ]]; then
+  export CFLAGS="${CFLAGS} -Wno-deprecated-declarations"
+  export CXXFLAGS="${CXXFLAGS} -Wno-deprecated-declarations"
+  export CPP="${CC} -E"
+  export CXXCPP="${CXX} -E"
+else
+ autoreconf -vfi
+fi
 
 if [[ "$target_platform" == linux* ]]; then
   # this changes the install dir from ${PREFIX}/lib64 to ${PREFIX}/lib
@@ -35,35 +31,11 @@ if [[ "$target_platform" == linux* ]]; then
   sed -i 's:@toolexeclibdir@:${libdir}:g' libffi.pc.in
 fi
 
-# Build out-of-tree to avoid libffi's auto-builddir feature, which re-execs
-# configure into a per-host subdir and races against our parallel make,
-# causing spurious CFI errors when assembling src/aarch64/sysv.S.
-mkdir -p _build
-cd _build
+./configure "${configure_args[@]}" || { cat config.log; exit 1;}
 
-../configure "${configure_args[@]}" || { cat config.log; exit 1;}
-
-echo "===== STEP: configure done, starting make ====="
-if ! make -j1 V=1 > make.log 2>&1; then
-    rc=$?
-    echo "===== MAKE FAILED with exit code $rc, last 300 lines: ====="
-    tail -n 300 make.log
-    exit $rc
-fi
-echo "===== STEP: make done, starting make install ====="
-# make check
-if ! make V=1 install > install.log 2>&1; then
-    rc=$?
-    echo "===== MAKE INSTALL FAILED with exit code $rc, last 300 lines: ====="
-    tail -n 300 install.log
-    exit $rc
-fi
-echo "===== STEP: make install done ====="
-
-cd ..
-
-echo "===== STEP: listing PREFIX/lib ====="
-ls -la "${PREFIX}/lib" || true
+make -j${CPU_COUNT} ${VERBOSE_AT}
+make check
+make install
 
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
