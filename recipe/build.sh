@@ -1,17 +1,9 @@
 #!/bin/bash
 
 set -ex
+shopt -s extglob
 
 cd $SRC_DIR
-
-# work-a-round for cyclic dependencies on OSX
-if [[ $target_platform == osx-* ]]; then
-  conda create -p $SRC_DIR/compilers clang_${target_platform} clangxx_${target_platform} --yes --quiet
-  cp -fr compilers/* $BUILD_PREFIX/. 2>/dev/null || true
-  # do manual activation ...
-  . $BUILD_PREFIX/etc/conda/activate.d/activate_clang_${target_platform}.sh
-  . $BUILD_PREFIX/etc/conda/activate.d/activate_clangxx_${target_platform}.sh
-fi
 
 export CFLAGS="${CFLAGS//-fvisibility=+([! ])/}"
 export CXXFLAGS="${CXXFLAGS//-fvisibility=+([! ])/}"
@@ -46,12 +38,6 @@ make -j${CPU_COUNT} ${VERBOSE_AT}
 make check
 make install
 
-if [[ $target_platform == osx-* ]]; then
-  # do manual deactivation ...
-  . $BUILD_PREFIX/etc/conda/deactivate.d/deactivate_clang_${target_platform}.sh
-  . $BUILD_PREFIX/etc/conda/deactivate.d/deactivate_clangxx_${target_platform}.sh
-fi
-
 # This overlaps with libgcc-ng:
 rm -rf ${PREFIX}/share/info/dir
 
@@ -61,7 +47,7 @@ pushd $PREFIX/lib
 # make sure we address also <lib>.so<.number>, and don't produce dead links
 if [[ -f libffi${SHLIB_EXT}.8 ]]; then
   ln -s libffi${SHLIB_EXT}.8 libffi${SHLIB_EXT}.7
-  if [[ ! -f libffi.8{SHLIB_EXT} ]]; then
+  if [[ ! -f libffi.8${SHLIB_EXT} ]]; then
     ln -s libffi${SHLIB_EXT}.8 libffi.8${SHLIB_EXT}
   fi
 fi

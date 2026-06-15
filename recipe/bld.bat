@@ -8,6 +8,7 @@ if "%ARCH%" == "64" (
 
 mkdir buildd
 cd buildd
+
 cmake -G "NMake Makefiles" ^
   -D CMAKE_BUILD_TYPE=Release ^
   -D CMAKE_PREFIX_PATH=%LIBRARY_PREFIX% ^
