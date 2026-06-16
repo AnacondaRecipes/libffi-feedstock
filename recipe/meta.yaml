@@ -15,7 +15,7 @@ source:
     - patches/fix_w3264_masm.patch                                             # [win]
     - patches/0004-LIBFFI_CLOSURE.patch                                        # [linux]
 build:
-  number: 2
+  number: 3
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', max_pin='x.x') }}

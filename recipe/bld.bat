@@ -1,3 +1,8 @@
+if "%ARCH%" == "64" (
+  set ARCH="x64"
+) else "%ARCH%" == "arm64" (
+  set ARCH="ARM64"
+)
 
 mkdir buildd
 cd buildd
