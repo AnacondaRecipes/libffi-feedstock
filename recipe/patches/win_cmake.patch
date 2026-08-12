@@ -678,10 +678,10 @@ index 0000000..1b36207
 +#endif
 +#endif
 diff --git a/src/closures.c b/src/closures.c
-index 5120021..c329077 100644
+index c1fbcf8..0f3fce7 100644
 --- a/src/closures.c
 +++ b/src/closures.c
-@@ -137,6 +137,7 @@ ffi_closure_free (void *ptr)
+@@ -139,6 +139,7 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
  /* Windows systems may have Data Execution Protection (DEP) enabled,
     which requires the use of VirtualMalloc/VirtualFree to alloc/free
     executable memory. */
@@ -690,17 +690,17 @@ index 5120021..c329077 100644
  # endif
  #endif
 diff --git a/src/dlmalloc.c b/src/dlmalloc.c
-index d63dd36..950e977 100644
+index 93e8196..748a7ca 100644
 --- a/src/dlmalloc.c
 +++ b/src/dlmalloc.c
-@@ -451,6 +451,7 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
+@@ -547,6 +547,7 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
  #ifdef WIN32
  #define WIN32_LEAN_AND_MEAN
  #include <windows.h>
 +#undef HAVE_MMAP
+ #include <tchar.h>
  #define HAVE_MMAP 1
  #define HAVE_MORECORE 0
- #define LACKS_UNISTD_H
 -- 
 2.23.0
 

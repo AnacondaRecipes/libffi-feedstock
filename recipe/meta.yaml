@@ -1,21 +1,23 @@
-{% set version = "3.4.8" %}
-{% set am_version = "1.15" %} # keep synchronized with build.sh
-{% set posix = 'm2-' if win else '' %}
-{% set native = 'm2w64-' if win else '' %}
+{% set name = "libffi" %}
+{% set version = "3.8.0" %}
 
 package:
-  name: libffi
+  name: {{ name }}
   version: {{ version }}
 
 source:
   url: https://github.com/libffi/libffi/releases/download/v{{version}}/libffi-{{version}}.tar.gz
-  sha256: bc9842a18898bfacb0ed1252c4febcc7e78fa139fd27fdc7a3e30d9d9356119b
+  sha256: 7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4
   patches:
     - patches/win_cmake.patch                                                  # [win]
     - patches/fix_w3264_masm.patch                                             # [win]
+    - patches/0001-arm64-use-a-dedicated-dylib-for-trampolines-so-it-ca.patch  # [osx]
+    - patches/0002-Add-support-for-ffi_find_closure_for_code_np-on-Appl.patch  # [osx]
+    - patches/0003-Don-t-define-FFI_COMPLEX_TYPEDEF-ifndef-FFI_TARGET_H.patch
     - patches/0004-LIBFFI_CLOSURE.patch                                        # [linux]
+
 build:
-  number: 3
+  number: 0
   run_exports:
     # good history: https://abi-laboratory.pro/tracker/timeline/libffi/
     - {{ pin_subpackage('libffi', max_pin='x.x') }}
